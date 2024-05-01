@@ -4,6 +4,7 @@ import com.yahia.forum.dto.PostsDto;
 import com.yahia.forum.dto.UserDto;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.User;
+import com.yahia.forum.entity.enums.UserType;
 import com.yahia.forum.mapper.PostsMapper;
 import com.yahia.forum.mapper.UserMapper;
 import com.yahia.forum.repository.PostsRepository;
@@ -92,5 +93,40 @@ public class PostsServiceImpl implements IPostsService {
         return postsDtoCollection;
 
     }
+
+    /**
+     * Fetches posts by user_type
+     *
+     * @param userType - user type could be student, teacher, admin
+     * @return collection of posts
+     */
+    @Override
+    public Collection<PostsDto> fetchPostsByUserType(UserType userType) {
+        // Fetch all posts from the repository
+        Collection<Posts> postsCollection = postsRepository.findAll();
+
+        // Filter and convert the collection of Posts objects to a collection of PostsDto objects using the Stream API
+        Collection<PostsDto> postsDtoCollection = postsCollection.stream()
+                // Map each post to a PostsDto object
+                .map(post -> {
+                    // Transform the post retrieved to postDto
+                    PostsDto postDto = PostsMapper.mapToPostsDTo(post, new PostsDto());
+                    // Find the user associated with the post and map them to a UserDto object
+                    UserDto userDto = UserMapper.mapToUserDTo(post.getUser(), new UserDto());
+                    // Set the userDto in the postDto
+                    postDto.setUserDto(userDto);
+                    // Return the postDto object
+                    return postDto;
+                })
+                // Filter the collection of PostsDto objects based on userType
+                .filter(postDto -> postDto.getUserDto().getUserType() == userType)
+                // Collect the filtered postsDto objects into a list
+                .collect(Collectors.toList());
+
+        // Return the collection of filtered PostsDto objects
+        return postsDtoCollection;
+    }
+
+
 
 }

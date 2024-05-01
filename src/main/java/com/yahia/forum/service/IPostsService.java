@@ -2,6 +2,7 @@ package com.yahia.forum.service;
 
 import com.yahia.forum.dto.PostsDto;
 import com.yahia.forum.dto.UserDto;
+import com.yahia.forum.entity.enums.UserType;
 
 import java.util.Collection;
 
@@ -24,5 +25,14 @@ public interface IPostsService {
      * @return collection of posts
      */
     Collection<PostsDto> fetchAllPosts();
+
+
+    /**
+     * Fetches posts by user_type
+     *
+     * @param userType - user type could be student , teacher , admin
+     * @return collection of posts
+     */
+    Collection<PostsDto> fetchPostsByUserType(UserType userType);
 
 }

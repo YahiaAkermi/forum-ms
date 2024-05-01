@@ -5,6 +5,7 @@ import com.yahia.forum.constants.PostConstants;
 import com.yahia.forum.dto.PostsDto;
 import com.yahia.forum.dto.ResponseDto;
 
+import com.yahia.forum.entity.enums.UserType;
 import com.yahia.forum.service.IPostsService;
 import lombok.AllArgsConstructor;
 
@@ -40,6 +41,19 @@ public class PostsController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(allposts);
+
+    }
+
+    @GetMapping("/fetch-with-filter")
+    public ResponseEntity<Collection<PostsDto>> fetchPostsByUserType(
+            @RequestParam UserType userType
+    ){
+
+        Collection<PostsDto> filteredPosts=iPostsService.fetchPostsByUserType(userType);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(filteredPosts);
 
     }
 
