@@ -13,7 +13,7 @@ public class PostsMapper {
         return postsDto;
     }
 
-    public static Posts mapToUser(PostsDto postsDto, Posts post) {
+    public static Posts mapToPost(PostsDto postsDto, Posts post) {
         post.setPostTitle(postsDto.getPostTitle());
         post.setPostContent(postsDto.getPostContent());
         return post;
