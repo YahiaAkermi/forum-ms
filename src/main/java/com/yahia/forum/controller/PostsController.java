@@ -3,6 +3,7 @@ package com.yahia.forum.controller;
 import com.yahia.forum.constants.PostConstants;
 
 import com.yahia.forum.dto.PostsDto;
+import com.yahia.forum.dto.PostsDtoWithId;
 import com.yahia.forum.dto.ResponseDto;
 
 import com.yahia.forum.entity.enums.UserType;
@@ -34,9 +35,9 @@ public class PostsController {
     }
 
     @GetMapping("/fetch")
-    public ResponseEntity<Collection<PostsDto>> fetchAllPosts(){
+    public ResponseEntity<Collection<PostsDtoWithId>> fetchAllPosts(){
 
-        Collection<PostsDto> allposts=iPostsService.fetchAllPosts();
+        Collection<PostsDtoWithId> allposts=iPostsService.fetchAllPosts();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -45,16 +46,18 @@ public class PostsController {
     }
 
     @GetMapping("/fetch-with-filter")
-    public ResponseEntity<Collection<PostsDto>> fetchPostsByUserType(
+    public ResponseEntity<Collection<PostsDtoWithId>> fetchPostsByUserType(
             @RequestParam UserType userType
     ){
 
-        Collection<PostsDto> filteredPosts=iPostsService.fetchPostsByUserType(userType);
+        Collection<PostsDtoWithId> filteredPosts=iPostsService.fetchPostsByUserType(userType);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(filteredPosts);
 
     }
+
+
 
 }

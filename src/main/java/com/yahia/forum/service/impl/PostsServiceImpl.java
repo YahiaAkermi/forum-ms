@@ -1,6 +1,7 @@
 package com.yahia.forum.service.impl;
 
 import com.yahia.forum.dto.PostsDto;
+import com.yahia.forum.dto.PostsDtoWithId;
 import com.yahia.forum.dto.UserDto;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.User;
@@ -72,20 +73,20 @@ public class PostsServiceImpl implements IPostsService {
      * @return collection of posts
      */
     @Override
-    public Collection<PostsDto> fetchAllPosts() {
+    public Collection<PostsDtoWithId> fetchAllPosts() {
 
         // Fetch all posts from the repository
         Collection<Posts> postsCollection = postsRepository.findAll();
 
 
         // Convert the collection of Posts objects to a collection of PostsDto objects using the Stream API
-        Collection<PostsDto> postsDtoCollection = postsCollection.stream()
+        Collection<PostsDtoWithId> postsDtoCollection = postsCollection.stream()
                 .map(post -> {
                     //here i transform the post retrieved to postdto
-                    PostsDto postDto = PostsMapper.mapToPostsDTo(post, new PostsDto());
+                    PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(post, new PostsDtoWithId());
                     //then I set the postCreator when retrieving the post
-                    postDto.setUserDto(UserMapper.mapToUserDTo2(userRepository.findById(post.getUser().getUserId()),new UserDto()) );
-                    return postDto;
+                    postsDtoWithId.setUserDto(UserMapper.mapToUserDTo2(userRepository.findById(post.getUser().getUserId()),new UserDto()) );
+                    return postsDtoWithId;
                 })
                 .collect(Collectors.toList());
 
@@ -101,25 +102,25 @@ public class PostsServiceImpl implements IPostsService {
      * @return collection of posts
      */
     @Override
-    public Collection<PostsDto> fetchPostsByUserType(UserType userType) {
+    public Collection<PostsDtoWithId> fetchPostsByUserType(UserType userType) {
         // Fetch all posts from the repository
         Collection<Posts> postsCollection = postsRepository.findAll();
 
         // Filter and convert the collection of Posts objects to a collection of PostsDto objects using the Stream API
-        Collection<PostsDto> postsDtoCollection = postsCollection.stream()
+        Collection<PostsDtoWithId> postsDtoCollection = postsCollection.stream()
                 // Map each post to a PostsDto object
                 .map(post -> {
                     // Transform the post retrieved to postDto
-                    PostsDto postDto = PostsMapper.mapToPostsDTo(post, new PostsDto());
+                    PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(post, new PostsDtoWithId());
                     // Find the user associated with the post and map them to a UserDto object
                     UserDto userDto = UserMapper.mapToUserDTo(post.getUser(), new UserDto());
                     // Set the userDto in the postDto
-                    postDto.setUserDto(userDto);
+                    postsDtoWithId.setUserDto(userDto);
                     // Return the postDto object
-                    return postDto;
+                    return postsDtoWithId;
                 })
                 // Filter the collection of PostsDto objects based on userType
-                .filter(postDto -> postDto.getUserDto().getUserType() == userType)
+                .filter(postsDtoWithId -> postsDtoWithId.getUserDto().getUserType() == userType)
                 // Collect the filtered postsDto objects into a list
                 .collect(Collectors.toList());
 
@@ -127,6 +128,14 @@ public class PostsServiceImpl implements IPostsService {
         return postsDtoCollection;
     }
 
+    /**
+     * @param postDto - PostsDto object
+     * @return boolean indicating if the post is updated or not
+     */
+    @Override
+    public boolean updatePost(PostsDto postDto) {
+        return true;
+    }
 
 
 }

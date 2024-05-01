@@ -1,6 +1,7 @@
 package com.yahia.forum.mapper;
 
 import com.yahia.forum.dto.PostsDto;
+import com.yahia.forum.dto.PostsDtoWithId;
 import com.yahia.forum.dto.UserDto;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.User;
@@ -17,5 +18,13 @@ public class PostsMapper {
         post.setPostTitle(postsDto.getPostTitle());
         post.setPostContent(postsDto.getPostContent());
         return post;
+    }
+
+
+    public static PostsDtoWithId mapToPostsDToWithId(Posts post, PostsDtoWithId postsDtoWithId) {
+        postsDtoWithId.setPostTitle(post.getPostTitle());
+        postsDtoWithId.setPostContent(post.getPostContent());
+        postsDtoWithId.setPostId(post.getPostId());
+        return postsDtoWithId;
     }
 }
