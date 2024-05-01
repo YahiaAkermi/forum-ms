@@ -1,6 +1,7 @@
 package com.yahia.forum.service.impl;
 
 import com.yahia.forum.dto.PostsDto;
+import com.yahia.forum.dto.UserDto;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.User;
 import com.yahia.forum.mapper.PostsMapper;
@@ -12,8 +13,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service @AllArgsConstructor
 public class PostsServiceImpl implements IPostsService {
@@ -59,6 +62,34 @@ public class PostsServiceImpl implements IPostsService {
         //saving it to the db
         postsRepository.save(post);
 
+
+    }
+
+    /**
+     * Fetches all posts
+     *
+     * @return collection of posts
+     */
+    @Override
+    public Collection<PostsDto> fetchAllPosts() {
+
+        // Fetch all posts from the repository
+        Collection<Posts> postsCollection = postsRepository.findAll();
+
+
+        // Convert the collection of Posts objects to a collection of PostsDto objects using the Stream API
+        Collection<PostsDto> postsDtoCollection = postsCollection.stream()
+                .map(post -> {
+                    //here i transform the post retrieved to postdto
+                    PostsDto postDto = PostsMapper.mapToPostsDTo(post, new PostsDto());
+                    //then I set the postCreator when retrieving the post
+                    postDto.setUserDto(UserMapper.mapToUserDTo2(userRepository.findById(post.getUser().getUserId()),new UserDto()) );
+                    return postDto;
+                })
+                .collect(Collectors.toList());
+
+        // Return the collection of PostsDto objects
+        return postsDtoCollection;
 
     }
 
