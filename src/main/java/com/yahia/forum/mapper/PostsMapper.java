@@ -3,10 +3,16 @@ package com.yahia.forum.mapper;
 import com.yahia.forum.dto.PostsDto;
 import com.yahia.forum.dto.PostsDtoWithId;
 import com.yahia.forum.dto.UserDto;
+import com.yahia.forum.dto.UserDtoWithId;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.User;
+import com.yahia.forum.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class PostsMapper {
+
+
+
 
     public static PostsDto mapToPostsDTo(Posts post, PostsDto postsDto) {
         postsDto.setPostTitle(post.getPostTitle());
@@ -26,5 +32,15 @@ public class PostsMapper {
         postsDtoWithId.setPostContent(post.getPostContent());
         postsDtoWithId.setPostId(post.getPostId());
         return postsDtoWithId;
+    }
+
+
+
+    public static Posts mapToPosts2(PostsDtoWithId postsDtoWithId,Posts post ) {
+        post.setPostTitle(postsDtoWithId.getPostTitle());
+        post.setPostContent(postsDtoWithId.getPostContent());
+        post.setPostId(postsDtoWithId.getPostId());
+        post.setUser(UserMapper.mapToUser(postsDtoWithId.getUserDto(),new User()));
+        return post;
     }
 }

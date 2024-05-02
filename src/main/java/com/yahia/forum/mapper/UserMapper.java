@@ -1,6 +1,7 @@
 package com.yahia.forum.mapper;
 
 import com.yahia.forum.dto.UserDto;
+import com.yahia.forum.dto.UserDtoWithId;
 import com.yahia.forum.entity.User;
 
 import java.util.Optional;
@@ -25,6 +26,14 @@ public class UserMapper {
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setUserType(userDto.getUserType());
+        return user;
+    }
+
+    public static  User mapFromUserDtoWithIdToUser(UserDtoWithId userDtoWithId, User user){
+        user.setUserType(userDtoWithId.getUserType());
+        user.setUserId(userDtoWithId.getUserId());
+        user.setEmail(userDtoWithId.getEmail());
+        user.setUsername(userDtoWithId.getUsername());
         return user;
     }
 

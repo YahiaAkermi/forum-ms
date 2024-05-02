@@ -38,9 +38,9 @@ public interface IPostsService {
 
     /**
      *
-     * @param postDto - PostsDto object
+     * @param postsDtoWithId - PostsDto object
      * @return boolean indicating if the post is updated or not
      */
-    boolean updatePost(PostsDto postDto);
+    boolean updatePost(PostsDtoWithId postsDtoWithId);
 
 }

@@ -6,6 +6,7 @@ import com.yahia.forum.dto.UserDto;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.User;
 import com.yahia.forum.entity.enums.UserType;
+import com.yahia.forum.exception.ResourceNotFoundException;
 import com.yahia.forum.mapper.PostsMapper;
 import com.yahia.forum.mapper.UserMapper;
 import com.yahia.forum.repository.PostsRepository;
@@ -129,11 +130,39 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     /**
-     * @param postDto - PostsDto object
+     * @param postsDtoWithId - PostsDtoWithId object
      * @return boolean indicating if the post is updated or not
      */
     @Override
-    public boolean updatePost(PostsDto postDto) {
+    public boolean updatePost(PostsDtoWithId postsDtoWithId) {
+
+        //checking if the user exists in postCreator table
+      User retrievedUser=userRepository.findUserByEmail(postsDtoWithId.getUserDto().getEmail()).orElseThrow(
+              () -> new ResourceNotFoundException("User","Email",postsDtoWithId.getUserDto().getEmail())
+      );
+
+      //checking if the post exists in posts table
+      Posts  retrievedPost= postsRepository.findById(postsDtoWithId.getPostId()).orElseThrow(
+              () -> new ResourceNotFoundException("Post","post ID",postsDtoWithId.getPostId())
+      );
+
+
+
+        //mapping to posts so i can the save the new one
+       Posts newPost= PostsMapper.mapToPosts2(postsDtoWithId,new Posts());
+
+       //if the user ever changes his username or userType but not his email
+       User newUser=new User(retrievedUser.getUserId(),postsDtoWithId.getUserDto().getUsername(),postsDtoWithId.getUserDto().getEmail(),postsDtoWithId.getUserDto().getUserType(),null);
+
+        //I should try to update the User table first
+
+
+       //saving the user in posts with his new username or userType but not a new email after updating his infos in PostCreator table
+       newPost.setUser(userRepository.save(newUser));
+
+       //saving newPost to the db
+       postsRepository.save(newPost);
+
         return true;
     }
 
