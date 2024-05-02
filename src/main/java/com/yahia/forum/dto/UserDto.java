@@ -7,6 +7,7 @@ import lombok.Data;
 public class UserDto {
 
     //lazm username ykoun unique
+
     private String username;
 
     //lazm email ykoun unique

@@ -36,8 +36,18 @@ public class UserServiceImpl implements IUserService {
 
         //I need first to check if the user already exists
         Optional<User> checkedUser=userRepository.findUserByEmail(user.getEmail());
+
+
+
         if(checkedUser.isPresent()){
             throw new UserAlreadyExistsExeption("user already registered with the given email :"+userDto.getEmail());
+        }
+
+        //checking if the username is already taken
+        boolean usernameAlreadyExists=userRepository.existsUserByUsername(user.getUsername());
+
+        if(usernameAlreadyExists){
+            throw new UserAlreadyExistsExeption("username : "+userDto.getUsername()+" is already taken please try another one ");
         }
 
 
