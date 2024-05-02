@@ -9,6 +9,7 @@ import com.yahia.forum.dto.ResponseDto;
 import com.yahia.forum.entity.enums.UserType;
 import com.yahia.forum.service.IPostsService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -73,6 +74,23 @@ public class PostsController {
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
                     .body(new ResponseDto(PostConstants.STATUS_417,PostConstants.MESSAGE_417_UPDATE));
+        }
+
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam String postId){
+
+        boolean isDeleted= iPostsService.deletePost(postId);
+
+        if(isDeleted){
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDto(PostConstants.STATUS_200,PostConstants.MESSAGE_200));
+        }else{
+            return ResponseEntity
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .body(new ResponseDto(PostConstants.STATUS_417,PostConstants.MESSAGE_417_DELETE));
         }
 
     }

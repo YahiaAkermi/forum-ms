@@ -148,7 +148,7 @@ public class PostsServiceImpl implements IPostsService {
 
 
 
-        //mapping to posts so i can the save the new one
+        //mapping to posts ,so I can the save the new one
        Posts newPost= PostsMapper.mapToPosts2(postsDtoWithId,new Posts());
 
        //if the user ever changes his username or userType but not his email
@@ -162,6 +162,22 @@ public class PostsServiceImpl implements IPostsService {
 
        //saving newPost to the db
        postsRepository.save(newPost);
+
+        return true;
+    }
+
+    /**
+     * @param postId - Input Post ID
+     * @return boolean indicaing if the post was deleted or not
+     */
+    @Override
+    public boolean deletePost(String postId) {
+
+        Posts posts=postsRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Posts","postId",postId)
+        );
+
+        postsRepository.deleteById(postId);
 
         return true;
     }

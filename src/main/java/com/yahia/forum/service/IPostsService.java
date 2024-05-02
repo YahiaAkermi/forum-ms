@@ -43,4 +43,13 @@ public interface IPostsService {
      */
     boolean updatePost(PostsDtoWithId postsDtoWithId);
 
+
+
+    /**
+     *
+     * @param postId - Input Post ID
+     * @return boolean indicaing if the post was deleted or not
+     */
+    boolean deletePost(String postId);
+
 }
