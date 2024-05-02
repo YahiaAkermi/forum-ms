@@ -5,21 +5,24 @@ import com.yahia.forum.dto.ResponseDto;
 import com.yahia.forum.dto.UserDto;
 import com.yahia.forum.entity.User;
 import com.yahia.forum.service.IUserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/postcreator")
-@AllArgsConstructor
+@AllArgsConstructor @Validated
 public class UserController {
 
     private IUserService iUserService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseDto> createUser(@RequestBody UserDto userDto){
+    public ResponseEntity<ResponseDto> createUser(@Valid @RequestBody UserDto userDto){
 
         //add the logic
         iUserService.createUser(userDto);
@@ -31,7 +34,9 @@ public class UserController {
     }
 
     @GetMapping("/fetch")
-    public ResponseEntity<UserDto> fetchUser(@RequestParam String email){
+    public ResponseEntity<UserDto> fetchUser(
+            @Email(message = "you should enter a valid email please")
+            @RequestParam String email){
 
         UserDto userDto=iUserService.fetchUser(email);
 
@@ -42,7 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseDto> updateUser(@RequestBody UserDto userDto){
+    public ResponseEntity<ResponseDto> updateUser(@Valid @RequestBody UserDto userDto){
 
         boolean isUpdated= iUserService.updateUser(userDto);
 
@@ -58,7 +63,9 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseDto> deleteUser(String email){
+    public ResponseEntity<ResponseDto> deleteUser(
+            @Email(message = "you should enter a valid email please")
+            String email){
 
         boolean isDeleted= iUserService.deleteUser(email);
 

@@ -14,20 +14,23 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/posts-api")
-@AllArgsConstructor
+@AllArgsConstructor @Validated
 public class PostsController {
 
 
     private IPostsService iPostsService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseDto> createPost(@RequestBody PostsDto postDto){
+    public ResponseEntity<ResponseDto> createPost(
+            @Valid
+            @RequestBody PostsDto postDto){
 
         iPostsService.createPost(postDto);
 
@@ -62,7 +65,9 @@ public class PostsController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseDto> updatePost( @RequestBody PostsDtoWithId postDtoWithId){
+    public ResponseEntity<ResponseDto> updatePost(
+            @Valid
+            @RequestBody PostsDtoWithId postDtoWithId){
 
         boolean isUpdated=iPostsService.updatePost(postDtoWithId);
 
@@ -79,7 +84,9 @@ public class PostsController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam String postId){
+    public ResponseEntity<ResponseDto> deleteAccount(
+            @Pattern(regexp = "(^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)",message = "postId isn't in UUID 32bit format please enter the right one")
+            @RequestParam String postId){
 
         boolean isDeleted= iPostsService.deletePost(postId);
 

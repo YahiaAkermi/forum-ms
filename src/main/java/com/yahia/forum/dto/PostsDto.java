@@ -13,8 +13,9 @@ public class PostsDto {
     private String postTitle;
 
     @NotEmpty(message = "Post content cannot be empty or null value")
-    @Size(min = 5 ,max = 200,message = "the content should be between 5 to 200 character")
+    @Size(min = 5 ,message = "the content should be at least 5 characters ")
     private String postContent;
+
 
     private UserDto userDto;
 }
