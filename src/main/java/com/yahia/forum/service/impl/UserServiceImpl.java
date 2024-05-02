@@ -54,9 +54,7 @@ public class UserServiceImpl implements IUserService {
         //initially he has no posts
         user.setPosts(null);
 
-        //set metadata
-        user.setCreatedAt(LocalDateTime.now());
-        user.setCreatedBy("admin");
+
 
         //save user to db
         userRepository.save(user);

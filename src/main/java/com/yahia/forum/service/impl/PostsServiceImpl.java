@@ -58,9 +58,7 @@ public class PostsServiceImpl implements IPostsService {
         String postId = UUID.randomUUID().toString();
         post.setPostId(postId);
 
-        //adding meta data
-        post.setCreatedAt(LocalDateTime.now());
-        post.setCreatedBy("admin");
+
 
         //saving it to the db
         postsRepository.save(post);
