@@ -1,12 +1,11 @@
 package com.yahia.forum.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Collection;
 
 @Entity @Data @AllArgsConstructor @NoArgsConstructor
 public class Posts extends BaseEntity{
@@ -21,6 +20,9 @@ public class Posts extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "idPostCreator")
     private User user;
+
+    @OneToMany(mappedBy = "post")
+    private Collection<Reply> replies;
 
 
 }

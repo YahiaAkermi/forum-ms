@@ -17,10 +17,10 @@ public class User extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    //lazm username ykoun unique
+    @Column(unique = true)
     private String username;
 
-    //lazm email ykoun unique
+    @Column(unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
@@ -29,5 +29,11 @@ public class User extends BaseEntity{
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private Collection<Posts> posts;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Collection<Reply> replies;
+
+
 
 }

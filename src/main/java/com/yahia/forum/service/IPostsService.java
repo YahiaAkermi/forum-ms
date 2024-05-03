@@ -13,7 +13,6 @@ public interface IPostsService {
      *this method will create post
      *@param postsDto -  PostsDto  object
      */
-
     void createPost(PostsDto postsDto);
 
 

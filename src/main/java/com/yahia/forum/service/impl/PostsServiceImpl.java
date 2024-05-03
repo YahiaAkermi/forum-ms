@@ -150,7 +150,7 @@ public class PostsServiceImpl implements IPostsService {
        Posts newPost= PostsMapper.mapToPosts2(postsDtoWithId,new Posts());
 
        //if the user ever changes his username or userType but not his email
-       User newUser=new User(retrievedUser.getUserId(),postsDtoWithId.getUserDto().getUsername(),postsDtoWithId.getUserDto().getEmail(),postsDtoWithId.getUserDto().getUserType(),null);
+       User newUser=new User(retrievedUser.getUserId(),postsDtoWithId.getUserDto().getUsername(),postsDtoWithId.getUserDto().getEmail(),postsDtoWithId.getUserDto().getUserType(),null,null);
 
         //I should try to update the User table first
 
