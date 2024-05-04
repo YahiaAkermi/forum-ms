@@ -2,10 +2,7 @@ package com.yahia.forum.controller;
 
 import com.yahia.forum.constants.PostConstants;
 import com.yahia.forum.constants.ReplyConstants;
-import com.yahia.forum.dto.PostWithRepliesDto;
-import com.yahia.forum.dto.PostsDto;
-import com.yahia.forum.dto.ReplyDto;
-import com.yahia.forum.dto.ResponseDto;
+import com.yahia.forum.dto.*;
 import com.yahia.forum.service.IPostsService;
 import com.yahia.forum.service.IReplyService;
 import jakarta.validation.Valid;
@@ -44,6 +41,24 @@ public class ReplyController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(postWithRepliesDto);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ResponseDto> updateAccountDetails(
+            @RequestBody ReplyWithIdtDto replyWithIdtDto){
+
+        boolean isUpdated= iReplyService.updateReply(replyWithIdtDto);
+
+        if(isUpdated){
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDto(ReplyConstants.STATUS_200,ReplyConstants.MESSAGE_200));
+        }else{
+            return ResponseEntity
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .body(new ResponseDto(ReplyConstants.STATUS_417,ReplyConstants.MESSAGE_417_UPDATE));
+        }
+
     }
 
 }

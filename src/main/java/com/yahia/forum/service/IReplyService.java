@@ -1,9 +1,6 @@
 package com.yahia.forum.service;
 
-import com.yahia.forum.dto.PostWithRepliesDto;
-import com.yahia.forum.dto.PostsDto;
-import com.yahia.forum.dto.PostsDtoWithId;
-import com.yahia.forum.dto.ReplyDto;
+import com.yahia.forum.dto.*;
 
 import java.util.Collection;
 
@@ -25,5 +22,13 @@ public  interface IReplyService {
      * @return collection of Replies
      */
     PostWithRepliesDto fetchPostReplies(String postId);
+
+
+    /**
+     *
+     * @param replyWithIdtDto - ReplyWithIdtDto object
+     * @return boolean indicaing if updating the reply was successfull or not
+     */
+    boolean updateReply(ReplyWithIdtDto replyWithIdtDto);
 
 }

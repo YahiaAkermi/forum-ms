@@ -97,4 +97,25 @@ public class ReplyServiceImpl implements IReplyService {
 
         return postWithRepliesDto;
     }
+
+    /**
+     * @param replyWithIdtDto - ReplyWithIdtDto object
+     * @return boolean indicaing if updating the reply was successfull or not
+     */
+    @Override
+    public boolean updateReply(ReplyWithIdtDto replyWithIdtDto) {
+
+        //checking if the replies already exists
+        Reply retrievedReply= replyRepository.findReplyByReplyId(replyWithIdtDto.getReplyId()).orElseThrow(
+                () -> new ResourceNotFoundException("Reply","reply ID", replyWithIdtDto.getReplyId())
+        );
+
+        //mapping replyDto to repy so i can save it in db
+        Reply newReply=ReplyMapper.mapFromRelyDtoWithIdToReply(replyWithIdtDto,retrievedReply);
+
+        //saving it to db
+        replyRepository.save(newReply);
+
+        return true;
+    }
 }
