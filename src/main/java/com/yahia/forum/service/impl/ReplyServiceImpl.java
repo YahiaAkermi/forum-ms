@@ -109,12 +109,12 @@ public class ReplyServiceImpl implements IReplyService {
     @Override
     public PostWithRepliesDto fetchRepliesOfParticularUserInASinglePost(String replierUsername,String postTitle) {
 
-        //checking if the Post already exists
-        Posts retrievedPost=postsRepository.findByPostTitleContains(postTitle).orElseThrow(
+        //checking if the Post already exists post title is not case-sensitive
+        Posts retrievedPost=postsRepository.findByPostTitleContainingIgnoreCase(postTitle).orElseThrow(
                 ()-> new ResourceNotFoundException("Post","post title",postTitle)
         );
 
-        //cheking if the User already exists
+        //cheking if the User already exists username should be accurate
         User retrievedUser=userRepository.findUserByUsernameContains(replierUsername).orElseThrow(
                 ()-> new ResourceNotFoundException("User","username",replierUsername)
         );
@@ -131,8 +131,15 @@ public class ReplyServiceImpl implements IReplyService {
         );
 
 
+        //mapping to post dto with id then  setting the post creator
 
-        PostWithRepliesDto postWithRepliesDto=new PostWithRepliesDto(PostsMapper.mapToPostsDToWithId(retrievedPost,new PostsDtoWithId()),relatedRepliesofUserOnSinglePost);
+        PostsDtoWithId postsDtoWithId=PostsMapper.mapToPostsDToWithId(retrievedPost,new PostsDtoWithId());
+        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(retrievedPost.getUser(),new UserDto()));
+
+
+
+        //forming my PostWithReplies dto , so I can expose it to the client
+        PostWithRepliesDto postWithRepliesDto=new PostWithRepliesDto(postsDtoWithId,relatedRepliesofUserOnSinglePost);
 
 
         return postWithRepliesDto;

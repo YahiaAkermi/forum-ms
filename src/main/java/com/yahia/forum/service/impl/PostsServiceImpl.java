@@ -128,6 +128,39 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     /**
+     * Fetches posts by post title
+     *
+     * @param postTitle - post title
+     * @return collection of posts
+     */
+    @Override
+    public Collection<PostsDtoWithId> fetchPostsByTitle(String postTitle) {
+
+        //fetching the posts with the title mentioned
+        Collection<Posts> postsRetrieved=postsRepository.findPostsByPostTitleContainsIgnoreCase(postTitle);
+
+        //turning them to posts dtos with IDs
+        Collection<PostsDtoWithId> postsDtoWithIds=postsRetrieved.stream().map(
+                post ->{
+                    //retrieve the post creator
+                    User user=userRepository.findUserByPosts(post).orElseThrow(
+                            ()-> new ResourceNotFoundException("User","post Id", post.getPostId())
+                    );
+                    //turning him to userDto ,so I can give it to the client
+                    UserDto userDto=UserMapper.mapToUserDTo(user,new UserDto());
+
+                    //maaping to postWithId dto then adding the post creator details
+                    PostsDtoWithId postsDtoWithId=PostsMapper.mapToPostsDToWithId(post,new PostsDtoWithId());
+                    postsDtoWithId.setUserDto(userDto);
+
+                    return postsDtoWithId;
+                }
+        ).collect(Collectors.toList());
+
+        return postsDtoWithIds;
+    }
+
+    /**
      * @param postsDtoWithId - PostsDtoWithId object
      * @return boolean indicating if the post is updated or not
      */

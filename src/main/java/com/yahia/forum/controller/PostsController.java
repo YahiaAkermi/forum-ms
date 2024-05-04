@@ -50,12 +50,25 @@ public class PostsController {
 
     }
 
-    @GetMapping("/fetch-with-filter")
+    @GetMapping("/fetch-with-filter-userType")
     public ResponseEntity<Collection<PostsDtoWithId>> fetchPostsByUserType(
             @RequestParam UserType userType
     ){
 
         Collection<PostsDtoWithId> filteredPosts=iPostsService.fetchPostsByUserType(userType);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(filteredPosts);
+
+    }
+
+    @GetMapping("/fetch-with-filter-post-title")
+    public ResponseEntity<Collection<PostsDtoWithId>> fetchPostsByTitle(
+            @RequestParam String postTitle
+    ){
+
+        Collection<PostsDtoWithId> filteredPosts=iPostsService.fetchPostsByTitle(postTitle);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

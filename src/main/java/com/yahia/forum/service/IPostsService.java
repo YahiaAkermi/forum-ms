@@ -36,6 +36,15 @@ public interface IPostsService {
 
 
     /**
+     * Fetches posts by post title
+     *
+     * @param postTitle - post title
+     * @return collection of posts
+     */
+    Collection<PostsDtoWithId> fetchPostsByTitle(String postTitle);
+
+
+    /**
      *
      * @param postsDtoWithId - PostsDto object
      * @return boolean indicating if the post is updated or not
