@@ -15,6 +15,7 @@ import com.yahia.forum.service.IReplyService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -94,6 +95,45 @@ public class ReplyServiceImpl implements IReplyService {
 
         // Create a PostWithRepliesDto object and return it
         PostWithRepliesDto postWithRepliesDto = new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+
+        return postWithRepliesDto;
+    }
+
+    /**
+     * Fetches replies of a given user in single post or subject
+     *
+     * @param replierUsername - of type String
+     * @param postTitle - of type String
+     * @return collection of PostWithRepliesDto
+     */
+    @Override
+    public PostWithRepliesDto fetchRepliesOfParticularUserInASinglePost(String replierUsername,String postTitle) {
+
+        //checking if the Post already exists
+        Posts retrievedPost=postsRepository.findByPostTitleContains(postTitle).orElseThrow(
+                ()-> new ResourceNotFoundException("Post","post title",postTitle)
+        );
+
+        //cheking if the User already exists
+        User retrievedUser=userRepository.findUserByUsernameContains(replierUsername).orElseThrow(
+                ()-> new ResourceNotFoundException("User","username",replierUsername)
+        );
+
+        //collecting replies for particular USER in a single post or subject after turning them to replies with ID
+        Collection<ReplyWithIdtDto> relatedRepliesofUserOnSinglePost=new ArrayList<>();
+
+        retrievedPost.getReplies().forEach(
+                reply -> {
+                    if(reply.getUser().getUsername().equals(replierUsername)){
+                        relatedRepliesofUserOnSinglePost.add(ReplyMapper.mapFromReplyToReplyWithIdDto(reply,new ReplyWithIdtDto()));
+                    }
+                }
+        );
+
+
+
+        PostWithRepliesDto postWithRepliesDto=new PostWithRepliesDto(PostsMapper.mapToPostsDToWithId(retrievedPost,new PostsDtoWithId()),relatedRepliesofUserOnSinglePost);
+
 
         return postWithRepliesDto;
     }

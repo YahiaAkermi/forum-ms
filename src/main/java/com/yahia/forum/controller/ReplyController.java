@@ -44,6 +44,17 @@ public class ReplyController {
                 .body(postWithRepliesDto);
     }
 
+    @GetMapping("/fetch-replies-of-user-in-particular-post")
+    public ResponseEntity<PostWithRepliesDto> fetchRepliesOfParticularUserInASinglePost(
+            @RequestParam String replierUsername,@RequestParam String postTitle){
+
+        PostWithRepliesDto postWithRepliesDto= iReplyService.fetchRepliesOfParticularUserInASinglePost(replierUsername,postTitle);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(postWithRepliesDto);
+    }
+
     @PutMapping("/update")
     public ResponseEntity<ResponseDto> updateAccountDetails(
             @RequestBody ReplyWithIdtDto replyWithIdtDto){

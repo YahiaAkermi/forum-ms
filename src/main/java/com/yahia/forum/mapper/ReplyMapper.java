@@ -21,6 +21,7 @@ public class ReplyMapper {
     }
 
     public static ReplyWithIdtDto mapFromReplyToReplyWithIdDto(Reply reply,ReplyWithIdtDto replyWithIdtDto){
+        replyWithIdtDto.setReplyId(reply.getReplyId());
         replyWithIdtDto.setReplierUsername(reply.getUser().getUsername());
         replyWithIdtDto.setReplyContent(reply.getReplyContent());
         return replyWithIdtDto;

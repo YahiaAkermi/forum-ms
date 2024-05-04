@@ -16,6 +16,10 @@ public interface PostsRepository extends JpaRepository<Posts,String> {
 
     Optional<Posts> findByPostId(String postId);
 
+    Optional<Posts> findByPostTitleContains(String postTitle);
+
+
+
 
 
 }

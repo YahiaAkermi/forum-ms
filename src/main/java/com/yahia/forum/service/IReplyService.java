@@ -19,9 +19,18 @@ public  interface IReplyService {
      * Fetches replies of a given post
      *
      * @param postId - of type String
-     * @return collection of Replies
+     * @return post with its replies
      */
     PostWithRepliesDto fetchPostReplies(String postId);
+
+    /**
+     * Fetches replies of a given user in single post or subject
+     *
+     * @param replierUsername - of type String
+     * @param postTitle - of type String
+     * @return collection of PostWithRepliesDto
+     */
+    PostWithRepliesDto fetchRepliesOfParticularUserInASinglePost(String replierUsername,String postTitle);
 
 
     /**
