@@ -6,6 +6,7 @@ import com.yahia.forum.dto.*;
 import com.yahia.forum.service.IPostsService;
 import com.yahia.forum.service.IReplyService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,23 @@ public class ReplyController {
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
                     .body(new ResponseDto(ReplyConstants.STATUS_417,ReplyConstants.MESSAGE_417_UPDATE));
+        }
+
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam String replyId){
+
+        boolean isDeleted= iReplyService.deleteReply(replyId);
+
+        if(isDeleted){
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDto(ReplyConstants.STATUS_200,ReplyConstants.MESSAGE_200));
+        }else{
+            return ResponseEntity
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .body(new ResponseDto(ReplyConstants.STATUS_417,ReplyConstants.MESSAGE_417_DELETE));
         }
 
     }

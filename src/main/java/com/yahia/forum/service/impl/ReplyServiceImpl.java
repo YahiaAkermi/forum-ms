@@ -118,4 +118,24 @@ public class ReplyServiceImpl implements IReplyService {
 
         return true;
     }
+
+    /**
+     * @param replyId - Input reply ID
+     * @return boolean indicaing if the reply was deleted or not
+     */
+    @Override
+    public boolean deleteReply(String replyId) {
+
+        //checking if the reply exists
+        Reply retrievedReply=replyRepository.findReplyByReplyId(replyId).orElseThrow(
+                () -> new ResourceNotFoundException("Reply","reply ID",replyId)
+        );
+
+        //deleting reply
+        replyRepository.delete(retrievedReply);
+
+        return true;
+    }
+
+
 }

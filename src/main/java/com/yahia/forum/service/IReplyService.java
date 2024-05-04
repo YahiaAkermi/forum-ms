@@ -31,4 +31,12 @@ public  interface IReplyService {
      */
     boolean updateReply(ReplyWithIdtDto replyWithIdtDto);
 
+
+    /**
+     *
+     * @param replyId - Input reply ID
+     * @return boolean indicaing if the reply was deleted or not
+     */
+    boolean deleteReply(String replyId);
+
 }
