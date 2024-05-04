@@ -2,6 +2,7 @@ package com.yahia.forum.mapper;
 
 import com.yahia.forum.dto.PostsDto;
 import com.yahia.forum.dto.ReplyDto;
+import com.yahia.forum.dto.ReplyWithIdtDto;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.Reply;
 
@@ -18,4 +19,11 @@ public class ReplyMapper {
         reply.setReplyContent(replyDto.getReplyContent());
         return reply;
     }
+
+    public static ReplyWithIdtDto mapFromReplyToReplyWithIdDto(Reply reply,ReplyWithIdtDto replyWithIdtDto){
+        replyWithIdtDto.setReplierUsername(reply.getUser().getUsername());
+        replyWithIdtDto.setReplyContent(reply.getReplyContent());
+        return replyWithIdtDto;
+    }
+
 }
