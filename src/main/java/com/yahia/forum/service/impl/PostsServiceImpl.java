@@ -9,6 +9,7 @@ import com.yahia.forum.entity.enums.UserType;
 import com.yahia.forum.exception.ResourceNotFoundException;
 import com.yahia.forum.mapper.PostsMapper;
 import com.yahia.forum.mapper.UserMapper;
+import com.yahia.forum.model.UserAuth;
 import com.yahia.forum.repository.PostsRepository;
 import com.yahia.forum.repository.UserRepository;
 import com.yahia.forum.service.IPostsService;
@@ -34,25 +35,33 @@ public class PostsServiceImpl implements IPostsService {
      * @param postsDto -  PostsDto  object
      */
     @Override
-    public void createPost(PostsDto postsDto) {
+    public void createPost(PostsDto postsDto, UserAuth userAuth) {
 
         //transforming it to post, so we can store it in the db
         Posts post= PostsMapper.mapToPost(postsDto,new Posts());
 
+         if(userAuth != null){
+             post.setUser(userAuth);
+         }else {
+             throw new ResourceNotFoundException("User","email",userAuth.getEmail());
+         }
+
+
+
         //checking if the user is post creator if not I insert the user then his post
-       User user=UserMapper.mapToUser(postsDto.getUserDto(),new User());
-       Optional<User> postCreator=userRepository.findUserByEmail(user.getEmail());
+//       User user=UserMapper.mapToUser(postsDto.getUserDto(),new User());
+//       Optional<User> postCreator=userRepository.findUserByEmail(user.getEmail());
 
-       if(postCreator.isEmpty()){
-           //adding the post creator id for a user who never posted after saving him in the db
-           user.setCreatedAt(LocalDateTime.now());
-           user.setCreatedBy("admin");
-           post.setUser(userRepository.save(user));
-       }else{
-           //adding the post creator id for user who is already a creator
-           post.setUser(postCreator.get());
-
-       }
+//       if(postCreator.isEmpty()){
+//           //adding the post creator id for a user who never posted after saving him in the db
+//           user.setCreatedAt(LocalDateTime.now());
+//           user.setCreatedBy("admin");
+//           post.setUser(userRepository.save(user));
+//       }else{
+//           //adding the post creator id for user who is already a creator
+//           post.setUser(postCreator.get());
+//
+//       }
 
         //genrating id for our post
         String postId = UUID.randomUUID().toString();
@@ -84,7 +93,7 @@ public class PostsServiceImpl implements IPostsService {
                     //here i transform the post retrieved to postdto
                     PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(post, new PostsDtoWithId());
                     //then I set the postCreator when retrieving the post
-                    postsDtoWithId.setUserDto(UserMapper.mapToUserDTo2(userRepository.findById(post.getUser().getUserId()),new UserDto()) );
+                    postsDtoWithId.setUserDto(UserMapper.mapToUserDTo2(userRepository.findById(post.getUser(). getUserId()),new UserDto()) );
                     return postsDtoWithId;
                 })
                 .collect(Collectors.toList());

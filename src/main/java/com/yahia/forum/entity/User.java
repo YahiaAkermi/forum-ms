@@ -2,14 +2,16 @@ package com.yahia.forum.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yahia.forum.entity.enums.UserType;
-import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.Collection;
 
-@Entity @Data @AllArgsConstructor @NoArgsConstructor
+@Entity
+@Data @AllArgsConstructor @NoArgsConstructor
 @Table(name = "PostCreator")
 public class User extends BaseEntity{
 

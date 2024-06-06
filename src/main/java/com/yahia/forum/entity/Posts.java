@@ -1,13 +1,16 @@
 package com.yahia.forum.entity;
 
-import jakarta.persistence.*;
+
+import com.yahia.forum.model.UserAuth;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.Collection;
 
-@Entity @Data @AllArgsConstructor @NoArgsConstructor
+@Entity
+@Data @AllArgsConstructor @NoArgsConstructor
 public class Posts extends BaseEntity{
 
     @Id
@@ -17,12 +20,18 @@ public class Posts extends BaseEntity{
 
     private String postContent;
 
-    @ManyToOne
-    @JoinColumn(name = "idPostCreator")
-    private User user;
+
 
     @OneToMany(mappedBy = "post")
     private Collection<Reply> replies;
+
+
+
+    @Transient
+    private UserAuth user;
+
+
+
 
 
 }

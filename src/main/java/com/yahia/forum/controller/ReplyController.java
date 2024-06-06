@@ -5,8 +5,7 @@ import com.yahia.forum.constants.ReplyConstants;
 import com.yahia.forum.dto.*;
 import com.yahia.forum.service.IPostsService;
 import com.yahia.forum.service.IReplyService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
