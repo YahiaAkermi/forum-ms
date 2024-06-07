@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 @RestController
 @RequestMapping("/reply-api")
 @AllArgsConstructor
@@ -38,6 +40,16 @@ public class ReplyController {
             String postId){
 
        PostWithRepliesDto postWithRepliesDto= iReplyService.fetchPostReplies(postId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(postWithRepliesDto);
+    }
+
+    @GetMapping("/fetch-all-posts-with-their-replies")
+    public ResponseEntity<Collection<PostWithRepliesDto>> fetchAllPostsWithTheirReplies(){
+
+        Collection<PostWithRepliesDto> postWithRepliesDto= iReplyService.fetchAllPostsWithTheirReplies();
 
         return ResponseEntity
                 .status(HttpStatus.OK)

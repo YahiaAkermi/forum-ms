@@ -12,13 +12,12 @@ import com.yahia.forum.repository.PostsRepository;
 import com.yahia.forum.repository.ReplyRepository;
 import com.yahia.forum.repository.UserRepository;
 import com.yahia.forum.service.IReplyService;
+import com.yahia.forum.utils.Utils;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service @AllArgsConstructor
@@ -42,21 +41,41 @@ public class ReplyServiceImpl implements IReplyService {
         );
 
         //checking if the username exists
-        User retrievedUser=userRepository.findUserByUsernameContains(replyDto.getUsername()).orElseThrow(
-                () -> new ResourceNotFoundException("User","username", replyDto.getUsername())
-        );
+        Optional<User> retrievedUser=userRepository.findUserByEmail(replyDto.getEmail());
 
-        //create id for reply
-        String replyId= UUID.randomUUID().toString();
+        //if the user is not in my db yet then , I add it
+        if(retrievedUser.isEmpty()){
+            User newUser=new User(null,replyDto.getUsername(),replyDto.getEmail(),null,null);
+            //i save it in my db
+            User userInMyDbNow=userRepository.save(newUser);
 
-        //mapping to reply ,so I can store it in db
-        Reply newReply= ReplyMapper.mapToReply(replyDto,new Reply());
-        newReply.setReplyId(replyId);
-        newReply.setUser(retrievedUser);
-        newReply.setPost(retrievedPost);
+            //create id for reply
+            String replyId= UUID.randomUUID().toString();
+
+            //mapping to reply ,so I can store it in db
+            Reply newReply= ReplyMapper.mapToReply(replyDto,new Reply());
+            newReply.setReplyId(replyId);
+            newReply.setUser(userInMyDbNow);
+            newReply.setPost(retrievedPost);
+
+            replyRepository.save(newReply);
+        }else {
+
+            //create id for reply
+            String replyId= UUID.randomUUID().toString();
+
+            //mapping to reply ,so I can store it in db
+            Reply newReply= ReplyMapper.mapToReply(replyDto,new Reply());
+            newReply.setReplyId(replyId);
+            newReply.setUser(retrievedUser.get());
+            newReply.setPost(retrievedPost);
 
 
-        replyRepository.save(newReply);
+            replyRepository.save(newReply);
+
+        }
+
+
     }
 
     /**
@@ -86,12 +105,20 @@ public class ReplyServiceImpl implements IReplyService {
 
         // Map the retrieved post to PostsDtoWithId
         PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(retrievedPost,new PostsDtoWithId());
+        //setting the image
+        postsDtoWithId.setImage(Utils.encodeImageToBase64(retrievedPost.getImage()));
 
         //getting the user who posted then transforming him to UserDto
         User userWhoPosted=userRepository.findUserByPosts(retrievedPost).orElseThrow(
                 () -> new ResourceNotFoundException("User","post ID",postId)
         );
-        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(userWhoPosted,new UserDto()));
+
+        //to add idUserGroup
+        UserDto myUserDto=new UserDto();
+        myUserDto.setIdUserGroup(retrievedPost.getIdGroup());
+
+        //then i set the userDto to postsDtoWithId
+        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(userWhoPosted,myUserDto));
 
         // Create a PostWithRepliesDto object and return it
         PostWithRepliesDto postWithRepliesDto = new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
@@ -134,7 +161,13 @@ public class ReplyServiceImpl implements IReplyService {
         //mapping to post dto with id then  setting the post creator
 
         PostsDtoWithId postsDtoWithId=PostsMapper.mapToPostsDToWithId(retrievedPost,new PostsDtoWithId());
-        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(retrievedPost.getUser(),new UserDto()));
+        //setting the image
+        postsDtoWithId.setImage(Utils.encodeImageToBase64(retrievedPost.getImage()));
+
+        //setting the idGroup to userDto
+        UserDto myUserDto=new UserDto();
+        myUserDto.setIdUserGroup(retrievedPost.getIdGroup());
+        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(retrievedPost.getUser(),myUserDto));
 
 
 
@@ -182,6 +215,23 @@ public class ReplyServiceImpl implements IReplyService {
         replyRepository.delete(retrievedReply);
 
         return true;
+    }
+
+    /**
+     * with this function I'm going to return all the posts with their replies
+     *
+     * @return Collection of PostWithRepliesDto
+     */
+    @Override
+    public Collection<PostWithRepliesDto> fetchAllPostsWithTheirReplies() {
+
+        Sort sort = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("updatedAt"));
+
+
+        Collection<Posts> allPosts=postsRepository.findAll(sort);
+
+
+
     }
 
 

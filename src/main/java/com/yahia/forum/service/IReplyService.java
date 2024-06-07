@@ -48,4 +48,10 @@ public  interface IReplyService {
      */
     boolean deleteReply(String replyId);
 
+    /**
+     * with this function I'm going to return all the posts with their replies
+     *
+     * @return Collection of PostWithRepliesDto
+     */
+    Collection<PostWithRepliesDto> fetchAllPostsWithTheirReplies();
 }
