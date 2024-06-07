@@ -7,6 +7,7 @@ import com.yahia.forum.dto.UserDtoWithId;
 import com.yahia.forum.entity.Posts;
 import com.yahia.forum.entity.User;
 import com.yahia.forum.repository.UserRepository;
+import com.yahia.forum.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class PostsMapper {
@@ -42,6 +43,8 @@ public class PostsMapper {
         post.setPostTitle(postsDtoWithId.getPostTitle());
         post.setPostContent(postsDtoWithId.getPostContent());
         post.setPostId(postsDtoWithId.getPostId());
+        post.setIdGroup(postsDtoWithId.getUserDto().getIdUserGroup());
+        post.setImage(Utils.decodeBase64ToImage(postsDtoWithId.getImage()));
         post.setUser(UserMapper.mapToUser(postsDtoWithId.getUserDto(),new User()));
         return post;
     }

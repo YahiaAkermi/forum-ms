@@ -27,12 +27,12 @@ public interface IPostsService {
 
 
     /**
-     * Fetches posts by user_type
+     * Fetches posts by group
      *
-     * @param userType - user type could be student , teacher , admin
+     * @param group - the group where group of student are taught by a teacher
      * @return collection of posts
      */
-    Collection<PostsDtoWithId> fetchPostsByUserType(UserType userType);
+    Collection<PostsDtoWithId> fetchPostsByGroup(String group);
 
 
     /**
@@ -42,6 +42,14 @@ public interface IPostsService {
      * @return collection of posts
      */
     Collection<PostsDtoWithId> fetchPostsByTitle(String postTitle);
+
+    /**
+     * Fetches posts created by a particular user
+     *
+     * @param email - String
+     * @return collection of posts
+     */
+    Collection<PostsDtoWithId> fetchPostsByEmail(String email);
 
 
     /**

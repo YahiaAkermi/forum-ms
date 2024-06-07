@@ -50,12 +50,12 @@ public class PostsController {
 
     }
 
-    @GetMapping("/fetch-with-filter-userType")
-    public ResponseEntity<Collection<PostsDtoWithId>> fetchPostsByUserType(
-            @RequestParam UserType userType
+    @GetMapping("/fetch-with-filter-group")
+    public ResponseEntity<Collection<PostsDtoWithId>> fetchPostsByGroup(
+            @RequestParam String group
     ){
 
-        Collection<PostsDtoWithId> filteredPosts=iPostsService.fetchPostsByUserType(userType);
+        Collection<PostsDtoWithId> filteredPosts=iPostsService.fetchPostsByGroup(group);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -69,6 +69,19 @@ public class PostsController {
     ){
 
         Collection<PostsDtoWithId> filteredPosts=iPostsService.fetchPostsByTitle(postTitle);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(filteredPosts);
+
+    }
+
+    @GetMapping("/fetch-with-filter-post-email")
+    public ResponseEntity<Collection<PostsDtoWithId>> fetchPostsByEmail(
+            @RequestParam String email
+    ){
+
+        Collection<PostsDtoWithId> filteredPosts=iPostsService.fetchPostsByEmail(email);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -17,10 +17,13 @@ public interface PostsRepository extends JpaRepository<Posts,String> {
     Optional<Posts> findByPostId(String postId);
 
 
+    Collection<Posts> findPostsByUser(User user);
 
     Optional<Posts> findByPostTitleContainingIgnoreCase(String postTitle);
 
     Collection<Posts> findPostsByPostTitleContainsIgnoreCase(String postTitle);
+
+    Collection<Posts> findPostsByIdGroup(String group);
 
 
 

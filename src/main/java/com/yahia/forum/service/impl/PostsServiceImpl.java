@@ -12,6 +12,7 @@ import com.yahia.forum.mapper.UserMapper;
 import com.yahia.forum.repository.PostsRepository;
 import com.yahia.forum.repository.UserRepository;
 import com.yahia.forum.service.IPostsService;
+import com.yahia.forum.utils.Utils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -114,15 +115,15 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     /**
-     * Fetches posts by user_type
+     * Fetches posts by group
      *
-     * @param userType - user type could be student, teacher, admin
+     * @param group - the group where group of student are taught by a teacher
      * @return collection of posts
      */
     @Override
-    public Collection<PostsDtoWithId> fetchPostsByUserType(UserType userType) {
+    public Collection<PostsDtoWithId> fetchPostsByGroup(String group) {
         // Fetch all posts from the repository
-        Collection<Posts> postsCollection = postsRepository.findAll();
+        Collection<Posts> postsCollection = postsRepository.findPostsByIdGroup(group);
 
         // Filter and convert the collection of Posts objects to a collection of PostsDto objects using the Stream API
         Collection<PostsDtoWithId> postsDtoCollection = postsCollection.stream()
@@ -130,8 +131,11 @@ public class PostsServiceImpl implements IPostsService {
                 .map(post -> {
                     // Transform the post retrieved to postDto
                     PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(post, new PostsDtoWithId());
+                    postsDtoWithId.setImage(Utils.encodeImageToBase64(post.getImage()));
+
                     // Find the user associated with the post and map them to a UserDto object
                     UserDto userDto = UserMapper.mapToUserDTo(post.getUser(), new UserDto());
+                    userDto.setIdUserGroup(post.getIdGroup());
                     // Set the userDto in the postDto
                     postsDtoWithId.setUserDto(userDto);
                     // Return the postDto object
@@ -167,9 +171,46 @@ public class PostsServiceImpl implements IPostsService {
                     );
                     //turning him to userDto ,so I can give it to the client
                     UserDto userDto=UserMapper.mapToUserDTo(user,new UserDto());
+                    userDto.setIdUserGroup(post.getIdGroup());
 
                     //maaping to postWithId dto then adding the post creator details
                     PostsDtoWithId postsDtoWithId=PostsMapper.mapToPostsDToWithId(post,new PostsDtoWithId());
+                    postsDtoWithId.setImage(Utils.encodeImageToBase64(post.getImage()));
+                    postsDtoWithId.setUserDto(userDto);
+
+                    return postsDtoWithId;
+                }
+        ).collect(Collectors.toList());
+
+        return postsDtoWithIds;
+    }
+
+    /**
+     * Fetches posts created by a particular user
+     *
+     * @param email - String
+     * @return collection of posts
+     */
+    @Override
+    public Collection<PostsDtoWithId> fetchPostsByEmail(String email) {
+
+        User user=userRepository.findUserByEmail(email).orElseThrow(
+                ()-> new ResourceNotFoundException("User","email", email)
+        );
+
+        Collection<Posts> retrievedPosts=postsRepository.findPostsByUser(user);
+
+        //turning them to posts dtos with IDs
+        Collection<PostsDtoWithId> postsDtoWithIds=retrievedPosts.stream().map(
+                post ->{
+
+                    //turning him to userDto ,so I can give it to the client
+                    UserDto userDto=UserMapper.mapToUserDTo(user,new UserDto());
+                    userDto.setIdUserGroup(post.getIdGroup());
+
+                    //maaping to postWithId dto then adding the post creator details
+                    PostsDtoWithId postsDtoWithId=PostsMapper.mapToPostsDToWithId(post,new PostsDtoWithId());
+                    postsDtoWithId.setImage(Utils.encodeImageToBase64(post.getImage()));
                     postsDtoWithId.setUserDto(userDto);
 
                     return postsDtoWithId;
@@ -202,13 +243,13 @@ public class PostsServiceImpl implements IPostsService {
        Posts newPost= PostsMapper.mapToPosts2(postsDtoWithId,new Posts());
 
        //if the user ever changes his username or userType but not his email
-//       User newUser=new User(retrievedUser.getUserId(),postsDtoWithId.getUserDto().getUsername(),postsDtoWithId.getUserDto().getEmail(),postsDtoWithId.getUserDto().getUserType(),null,null);
+   User newUser=new User(retrievedUser.getUserId(),postsDtoWithId.getUserDto().getUsername(),postsDtoWithId.getUserDto().getEmail(),retrievedUser.getPosts(),retrievedUser.getReplies());
 
         //I should try to update the User table first
 
 
        //saving the user in posts with his new username or userType but not a new email after updating his infos in PostCreator table
-//       newPost.setUser(userRepository.save(newUser));
+      newPost.setUser(userRepository.save(newUser));
 
        //saving newPost to the db
        postsRepository.save(newPost);
@@ -227,7 +268,7 @@ public class PostsServiceImpl implements IPostsService {
                 () -> new ResourceNotFoundException("Posts","postId",postId)
         );
 
-        postsRepository.deleteById(postId);
+        postsRepository.deleteById(posts.getPostId());
 
         return true;
     }
