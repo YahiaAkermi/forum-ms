@@ -23,6 +23,7 @@ public class PostsMapper {
     public static Posts mapToPost(PostsDto postsDto, Posts post) {
         post.setPostTitle(postsDto.getPostTitle());
         post.setPostContent(postsDto.getPostContent());
+
         return post;
     }
 
@@ -31,6 +32,7 @@ public class PostsMapper {
         postsDtoWithId.setPostTitle(post.getPostTitle());
         postsDtoWithId.setPostContent(post.getPostContent());
         postsDtoWithId.setPostId(post.getPostId());
+        postsDtoWithId.setImage(postsDtoWithId.getImage());
         return postsDtoWithId;
     }
 

@@ -17,6 +17,12 @@ public class Posts extends BaseEntity{
 
     private String postContent;
 
+    private String idGroup;
+
+    @Lob
+    @Column(name = "image", columnDefinition = "BLOB")
+    private byte[] image;
+
     @ManyToOne
     @JoinColumn(name = "idPostCreator")
     private User user;

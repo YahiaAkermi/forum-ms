@@ -23,8 +23,6 @@ public class User extends BaseEntity{
     @Column(unique = true)
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore

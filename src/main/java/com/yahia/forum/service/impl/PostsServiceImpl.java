@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +39,13 @@ public class PostsServiceImpl implements IPostsService {
 
         //transforming it to post, so we can store it in the db
         Posts post= PostsMapper.mapToPost(postsDto,new Posts());
+        //indicating in which group the post belongs
+        post.setIdGroup(postsDto.getUserDto().getIdUserGroup());
+
+
+        // Decode base64 image
+        byte[] imageBytes = Base64.getDecoder().decode(postsDto.getImage());
+        post.setImage(imageBytes);
 
         //checking if the user is post creator if not I insert the user then his post
        User user=UserMapper.mapToUser(postsDto.getUserDto(),new User());
@@ -84,7 +92,18 @@ public class PostsServiceImpl implements IPostsService {
                     //here i transform the post retrieved to postdto
                     PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(post, new PostsDtoWithId());
                     //then I set the postCreator when retrieving the post
-                    postsDtoWithId.setUserDto(UserMapper.mapToUserDTo2(userRepository.findById(post.getUser().getUserId()),new UserDto()) );
+
+                    UserDto myUserDto=UserMapper.mapToUserDTo2(userRepository.findById(post.getUser().getUserId()),new UserDto());
+                    myUserDto.setIdUserGroup(post.getIdGroup());
+                    postsDtoWithId.setUserDto( myUserDto);
+
+
+                    // Convert byte array to Base64 encoded string then adding it to postsDtoWithId
+                    String base64Image = Base64.getEncoder().encodeToString(post.getImage());
+                    postsDtoWithId.setImage(base64Image);
+
+
+
                     return postsDtoWithId;
                 })
                 .collect(Collectors.toList());
@@ -119,7 +138,7 @@ public class PostsServiceImpl implements IPostsService {
                     return postsDtoWithId;
                 })
                 // Filter the collection of PostsDto objects based on userType
-                .filter(postsDtoWithId -> postsDtoWithId.getUserDto().getUserType() == userType)
+//                .filter(postsDtoWithId -> postsDtoWithId.getUserDto().getUserType() == userType)
                 // Collect the filtered postsDto objects into a list
                 .collect(Collectors.toList());
 
@@ -183,13 +202,13 @@ public class PostsServiceImpl implements IPostsService {
        Posts newPost= PostsMapper.mapToPosts2(postsDtoWithId,new Posts());
 
        //if the user ever changes his username or userType but not his email
-       User newUser=new User(retrievedUser.getUserId(),postsDtoWithId.getUserDto().getUsername(),postsDtoWithId.getUserDto().getEmail(),postsDtoWithId.getUserDto().getUserType(),null,null);
+//       User newUser=new User(retrievedUser.getUserId(),postsDtoWithId.getUserDto().getUsername(),postsDtoWithId.getUserDto().getEmail(),postsDtoWithId.getUserDto().getUserType(),null,null);
 
         //I should try to update the User table first
 
 
        //saving the user in posts with his new username or userType but not a new email after updating his infos in PostCreator table
-       newPost.setUser(userRepository.save(newUser));
+//       newPost.setUser(userRepository.save(newUser));
 
        //saving newPost to the db
        postsRepository.save(newPost);

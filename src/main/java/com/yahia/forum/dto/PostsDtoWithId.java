@@ -19,6 +19,9 @@ public class PostsDtoWithId {
     @Size(min = 5 ,max = 200,message = "the content should be between 5 to 200 character")
     private String postContent;
 
+    @NotEmpty(message = "Post image cannot be empty or null value")
+    private String image;   // Base64 encoded string
+
 
     private UserDto userDto;
 }
