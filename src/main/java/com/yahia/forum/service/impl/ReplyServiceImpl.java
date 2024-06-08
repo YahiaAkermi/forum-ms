@@ -304,4 +304,49 @@ public class ReplyServiceImpl implements IReplyService {
     }
 
 
+    /**
+     * Fetches posts filtered by group ID
+     *
+     * @param idGroup - the group ID to filter by
+     * @return collection of PostWithRepliesDto
+     */
+    public Collection<PostWithRepliesDto> filterPostsByGroupId(String idGroup) {
+        // Fetch posts that belong to the specified group ID
+        Collection<Posts> filteredPosts = postsRepository.findPostsByIdGroup(idGroup);
+
+        return filteredPosts.stream().map(posts -> {
+            // Map to PostsDtoWithId
+            PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(posts, new PostsDtoWithId());
+            postsDtoWithId.setImage(Utils.encodeImageToBase64(posts.getImage()));
+
+            // Set the UserDto
+            UserDto myUserDto = new UserDto();
+            myUserDto.setIdUserGroup(posts.getIdGroup());
+
+            Optional<User> retrievedUser = userRepository.findUserByPosts(posts);
+            if (retrievedUser.isPresent()) {
+                User user = retrievedUser.get();
+                myUserDto.setEmail(user.getEmail());
+                myUserDto.setUsername(user.getUsername());
+            }
+
+            postsDtoWithId.setUserDto(myUserDto);
+
+            // Form the replies for the post
+            Collection<Reply> retrievedReplies = replyRepository.findRepliesByPost(posts);
+
+            Collection<ReplyWithIdtDto> repliesWithIdDto = retrievedReplies.stream()
+                    .map(reply -> {
+                        ReplyWithIdtDto replyWithIdDto = ReplyMapper.mapFromReplyToReplyWithIdDto(reply, new ReplyWithIdtDto());
+                        replyWithIdDto.setReplyId(reply.getReplyId());
+                        replyWithIdDto.setReplierEmail(reply.getUser().getEmail());
+                        return replyWithIdDto;
+                    })
+                    .collect(Collectors.toList());
+
+            return new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+        }).collect(Collectors.toList());
+    }
+
+
 }

@@ -77,6 +77,17 @@ public class ReplyController {
                 .body(postWithRepliesDto);
     }
 
+    @GetMapping("/fetch-all-posts-of-particular-group")
+    public ResponseEntity<Collection<PostWithRepliesDto>> fetchPostsOfParticularGroup(
+            @RequestParam String idGroup){
+
+        Collection<PostWithRepliesDto> postWithRepliesDto= iReplyService.filterPostsByGroupId(idGroup);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(postWithRepliesDto);
+    }
+
     @PutMapping("/update")
     public ResponseEntity<ResponseDto> updateAccountDetails(
             @RequestBody ReplyWithIdtDto replyWithIdtDto){

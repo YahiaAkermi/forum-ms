@@ -66,4 +66,13 @@ public  interface IReplyService {
     Collection<PostWithRepliesDto> filterPostsByContent(String content,String idGroup);
 
 
+    /**
+     * Fetches posts filtered by group ID
+     *
+     * @param idGroup - the group ID to filter by
+     * @return collection of PostWithRepliesDto
+     */
+    Collection<PostWithRepliesDto> filterPostsByGroupId(String idGroup);
+
+
 }
