@@ -99,6 +99,7 @@ public class ReplyServiceImpl implements IReplyService {
                 .map(reply -> {
                     ReplyWithIdtDto replyWithIdDto = ReplyMapper.mapFromReplyToReplyWithIdDto(reply,new ReplyWithIdtDto());
                     replyWithIdDto.setReplyId(reply.getReplyId());
+                    replyWithIdDto.setReplierEmail(reply.getUser().getEmail());
                     return replyWithIdDto;
                 })
                 .collect(Collectors.toList());
@@ -152,7 +153,9 @@ public class ReplyServiceImpl implements IReplyService {
         retrievedPost.getReplies().forEach(
                 reply -> {
                     if(reply.getUser().getUsername().equals(replierUsername)){
-                        relatedRepliesofUserOnSinglePost.add(ReplyMapper.mapFromReplyToReplyWithIdDto(reply,new ReplyWithIdtDto()));
+                        ReplyWithIdtDto replyWithIdtDto=ReplyMapper.mapFromReplyToReplyWithIdDto(reply,new ReplyWithIdtDto());
+                        replyWithIdtDto.setReplierEmail(reply.getUser().getEmail());
+                        relatedRepliesofUserOnSinglePost.add(replyWithIdtDto);
                     }
                 }
         );
@@ -217,21 +220,87 @@ public class ReplyServiceImpl implements IReplyService {
         return true;
     }
 
-    /**
-     * with this function I'm going to return all the posts with their replies
-     *
-     * @return Collection of PostWithRepliesDto
-     */
     @Override
     public Collection<PostWithRepliesDto> fetchAllPostsWithTheirReplies() {
-
         Sort sort = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("updatedAt"));
+        List<Posts> allPosts = postsRepository.findAll(sort);
 
+        return allPosts.stream().map(posts -> {
+            // Turning it to PostsDtoWithId
+            PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(posts, new PostsDtoWithId());
+            postsDtoWithId.setImage(Utils.encodeImageToBase64(posts.getImage()));
 
-        Collection<Posts> allPosts=postsRepository.findAll(sort);
+            // Setting its UserDto
+            UserDto myUserDto = new UserDto();
+            myUserDto.setIdUserGroup(posts.getIdGroup());
 
+            Optional<User> retrievedUser = userRepository.findUserByPosts(posts);
+            if (retrievedUser.isPresent()) {
+                User user = retrievedUser.get();
+                myUserDto.setEmail(user.getEmail());
+                myUserDto.setUsername(user.getUsername());
+            }
 
+            postsDtoWithId.setUserDto(myUserDto);
 
+            // Forming the replies for the post
+            Collection<Reply> retrievedReplies = replyRepository.findRepliesByPost(posts);
+
+            List<ReplyWithIdtDto> repliesWithIdDto = retrievedReplies.stream()
+                    .map(reply -> {
+                        ReplyWithIdtDto replyWithIdDto = ReplyMapper.mapFromReplyToReplyWithIdDto(reply, new ReplyWithIdtDto());
+                        replyWithIdDto.setReplyId(reply.getReplyId());
+                        replyWithIdDto.setReplierEmail(reply.getUser().getEmail());
+                        return replyWithIdDto;
+                    })
+                    .collect(Collectors.toList());
+
+            return new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Fetches posts filtered by content
+     *
+     * @param content - the content to filter by
+     * @return collection of PostWithRepliesDto
+     */
+    public Collection<PostWithRepliesDto> filterPostsByContent(String content,String idGroup) {
+        // Fetch posts that contain the specified content and in which group the post is present
+        List<Posts> filteredPosts = postsRepository.findPostsByPostContentContainingIgnoreCaseAndIdGroupContainingIgnoreCase(content,idGroup);
+
+        return filteredPosts.stream().map(posts -> {
+            // Map to PostsDtoWithId
+            PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(posts, new PostsDtoWithId());
+            postsDtoWithId.setImage(Utils.encodeImageToBase64(posts.getImage()));
+
+            // Set the UserDto
+            UserDto myUserDto = new UserDto();
+            myUserDto.setIdUserGroup(posts.getIdGroup());
+
+            Optional<User> retrievedUser = userRepository.findUserByPosts(posts);
+            if (retrievedUser.isPresent()) {
+                User user = retrievedUser.get();
+                myUserDto.setEmail(user.getEmail());
+                myUserDto.setUsername(user.getUsername());
+            }
+
+            postsDtoWithId.setUserDto(myUserDto);
+
+            // Form the replies for the post
+            Collection<Reply> retrievedReplies = replyRepository.findRepliesByPost(posts);
+
+            List<ReplyWithIdtDto> repliesWithIdDto = retrievedReplies.stream()
+                    .map(reply -> {
+                        ReplyWithIdtDto replyWithIdDto = ReplyMapper.mapFromReplyToReplyWithIdDto(reply, new ReplyWithIdtDto());
+                        replyWithIdDto.setReplyId(reply.getReplyId());
+                        replyWithIdDto.setReplierEmail(reply.getUser().getEmail());
+                        return replyWithIdDto;
+                    })
+                    .collect(Collectors.toList());
+
+            return new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+        }).collect(Collectors.toList());
     }
 
 

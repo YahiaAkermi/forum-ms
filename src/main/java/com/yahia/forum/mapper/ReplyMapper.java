@@ -30,6 +30,7 @@ public class ReplyMapper {
     public static Reply mapFromRelyDtoWithIdToReply(ReplyWithIdtDto replyWithIdtDto, Reply reply) {
         reply.setReplyId(replyWithIdtDto.getReplyId());
         reply.setReplyContent(replyWithIdtDto.getReplyContent());
+
         return reply;
     }
 

@@ -56,6 +56,16 @@ public class ReplyController {
                 .body(postWithRepliesDto);
     }
 
+    @GetMapping("/fetch-all-posts-filter-by-content")
+    public ResponseEntity<Collection<PostWithRepliesDto>> fetchAllPostsfiliteredByContent(@RequestParam String content,@RequestParam String idGroup){
+
+        Collection<PostWithRepliesDto> postWithRepliesDto= iReplyService.filterPostsByContent(content,idGroup);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(postWithRepliesDto);
+    }
+
     @GetMapping("/fetch-replies-of-user-in-particular-post")
     public ResponseEntity<PostWithRepliesDto> fetchRepliesOfParticularUserInASinglePost(
             @RequestParam String replierUsername,@RequestParam String postTitle){

@@ -54,4 +54,16 @@ public  interface IReplyService {
      * @return Collection of PostWithRepliesDto
      */
     Collection<PostWithRepliesDto> fetchAllPostsWithTheirReplies();
+
+
+    /**
+     * Fetches posts filtered by content
+     *
+     * @param content - the content to filter by
+     * @param idGroup - the group where post is present
+     * @return collection of PostWithRepliesDto
+     */
+    Collection<PostWithRepliesDto> filterPostsByContent(String content,String idGroup);
+
+
 }

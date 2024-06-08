@@ -7,6 +7,8 @@ public class ReplyWithIdtDto {
 
     private String replyId;
 
+    private String replierEmail;
+
     private String replierUsername;
 
     private String replyContent;
