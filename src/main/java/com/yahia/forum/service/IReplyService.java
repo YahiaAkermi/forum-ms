@@ -75,4 +75,15 @@ public  interface IReplyService {
     Collection<PostWithRepliesDto> filterPostsByGroupId(String idGroup);
 
 
+    /**
+     * Fetch all groups that a certain user is in then all posts of that group with their replies
+     *
+     * @param email - email of the user
+     * @return collection of collection PostWithRepliesDto
+     */
+    Collection<Collection<PostWithRepliesDto>> fetchGroupsOfParticularUser(String email);
+
+
+
+
 }

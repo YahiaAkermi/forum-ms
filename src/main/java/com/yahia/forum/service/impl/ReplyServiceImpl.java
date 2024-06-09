@@ -348,5 +348,47 @@ public class ReplyServiceImpl implements IReplyService {
         }).collect(Collectors.toList());
     }
 
+    /**
+     * Fetch all groups that a certain user is in then all posts of that group with their replies
+     *
+     * @param email - email of the user
+     * @return collection of collection PostWithRepliesDto
+     */
+    @Override
+    public Collection<Collection<PostWithRepliesDto>> fetchGroupsOfParticularUser(String email) {
+
+        // Retrieve the user by email
+        User retrievedUser = userRepository.findUserByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException("User", "email", email)
+        );
+
+        // Fetch all posts by the user
+        Collection<Posts> userPosts = postsRepository.findPostsByUser(retrievedUser);
+
+        // Extract unique group IDs from the user's posts
+        Set<String> uniqueGroupIds = userPosts.stream()
+                .map(Posts::getIdGroup)
+                .collect(Collectors.toSet());
+
+        // Collection to hold posts with replies for each group
+        Collection<Collection<PostWithRepliesDto>> groupsPostsWithReplies = new ArrayList<>();
+
+        for (String groupId : uniqueGroupIds) {
+            // Fetch posts of the current group using the existing method
+            Collection<PostWithRepliesDto> postsWithRepliesDtos = filterPostsByGroupId(groupId);
+
+            // Add the posts with replies of the current group to the main collection
+            groupsPostsWithReplies.add(postsWithRepliesDtos);
+        }
+
+        // Adding general group also
+        Collection<PostWithRepliesDto> generalGroupPosts = filterPostsByGroupId("");
+        groupsPostsWithReplies.add(generalGroupPosts);
+
+        return groupsPostsWithReplies;
+    }
+
+
+
 
 }

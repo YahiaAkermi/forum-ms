@@ -88,6 +88,17 @@ public class ReplyController {
                 .body(postWithRepliesDto);
     }
 
+    @GetMapping("/fetch-all-groups-of-particular-user")
+    public ResponseEntity<Collection<Collection<PostWithRepliesDto>>> fetchGroupOfParticularUser(
+            @RequestParam String email){
+
+        Collection<Collection<PostWithRepliesDto>> postWithRepliesDto= iReplyService.fetchGroupsOfParticularUser(email);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(postWithRepliesDto);
+    }
+
     @PutMapping("/update")
     public ResponseEntity<ResponseDto> updateAccountDetails(
             @RequestBody ReplyWithIdtDto replyWithIdtDto){
