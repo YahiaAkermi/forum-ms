@@ -86,7 +86,6 @@ public class ReplyServiceImpl implements IReplyService {
      */
     @Override
     public PostWithRepliesDto fetchPostReplies(String postId) {
-
         // Check if the post exists
         Posts retrievedPost = postsRepository.findByPostId(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "post ID", postId));
@@ -97,7 +96,7 @@ public class ReplyServiceImpl implements IReplyService {
         // Transforming reply to ReplyWithIdDto using Stream API and collecting to a list
         List<ReplyWithIdtDto> repliesWithIdDto = retrievedReplies.stream()
                 .map(reply -> {
-                    ReplyWithIdtDto replyWithIdDto = ReplyMapper.mapFromReplyToReplyWithIdDto(reply,new ReplyWithIdtDto());
+                    ReplyWithIdtDto replyWithIdDto = ReplyMapper.mapFromReplyToReplyWithIdDto(reply, new ReplyWithIdtDto());
                     replyWithIdDto.setReplyId(reply.getReplyId());
                     replyWithIdDto.setReplierEmail(reply.getUser().getEmail());
                     return replyWithIdDto;
@@ -105,27 +104,32 @@ public class ReplyServiceImpl implements IReplyService {
                 .collect(Collectors.toList());
 
         // Map the retrieved post to PostsDtoWithId
-        PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(retrievedPost,new PostsDtoWithId());
-        //setting the image
+        PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(retrievedPost, new PostsDtoWithId());
         postsDtoWithId.setImage(Utils.encodeImageToBase64(retrievedPost.getImage()));
 
-        //getting the user who posted then transforming him to UserDto
-        User userWhoPosted=userRepository.findUserByPosts(retrievedPost).orElseThrow(
-                () -> new ResourceNotFoundException("User","post ID",postId)
+        // getting the user who posted then transforming him to UserDto
+        User userWhoPosted = userRepository.findUserByPosts(retrievedPost).orElseThrow(
+                () -> new ResourceNotFoundException("User", "post ID", postId)
         );
 
-        //to add idUserGroup
-        UserDto myUserDto=new UserDto();
+        // to add idUserGroup
+        UserDto myUserDto = new UserDto();
         myUserDto.setIdUserGroup(retrievedPost.getIdGroup());
 
-        //then i set the userDto to postsDtoWithId
-        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(userWhoPosted,myUserDto));
+        // then i set the userDto to postsDtoWithId
+        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(userWhoPosted, myUserDto));
 
         // Create a PostWithRepliesDto object and return it
-        PostWithRepliesDto postWithRepliesDto = new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+        PostWithRepliesDto postWithRepliesDto = new PostWithRepliesDto(
+                retrievedPost.getCreatedAt(),
+                retrievedPost.getUpdatedAt(),
+                postsDtoWithId,
+                repliesWithIdDto
+        );
 
         return postWithRepliesDto;
     }
+
 
     /**
      * Fetches replies of a given user in single post or subject
@@ -135,51 +139,48 @@ public class ReplyServiceImpl implements IReplyService {
      * @return collection of PostWithRepliesDto
      */
     @Override
-    public PostWithRepliesDto fetchRepliesOfParticularUserInASinglePost(String replierUsername,String postTitle) {
-
-        //checking if the Post already exists post title is not case-sensitive
-        Posts retrievedPost=postsRepository.findByPostTitleContainingIgnoreCase(postTitle).orElseThrow(
-                ()-> new ResourceNotFoundException("Post","post title",postTitle)
+    public PostWithRepliesDto fetchRepliesOfParticularUserInASinglePost(String replierUsername, String postTitle) {
+        // checking if the Post already exists post title is not case-sensitive
+        Posts retrievedPost = postsRepository.findByPostTitleContainingIgnoreCase(postTitle).orElseThrow(
+                () -> new ResourceNotFoundException("Post", "post title", postTitle)
         );
 
-        //cheking if the User already exists username should be accurate
-        User retrievedUser=userRepository.findUserByUsernameContains(replierUsername).orElseThrow(
-                ()-> new ResourceNotFoundException("User","username",replierUsername)
+        // checking if the User already exists username should be accurate
+        User retrievedUser = userRepository.findUserByUsernameContains(replierUsername).orElseThrow(
+                () -> new ResourceNotFoundException("User", "username", replierUsername)
         );
 
-        //collecting replies for particular USER in a single post or subject after turning them to replies with ID
-        Collection<ReplyWithIdtDto> relatedRepliesofUserOnSinglePost=new ArrayList<>();
+        // collecting replies for particular USER in a single post or subject after turning them to replies with ID
+        Collection<ReplyWithIdtDto> relatedRepliesOfUserOnSinglePost = retrievedPost.getReplies().stream()
+                .filter(reply -> reply.getUser().getUsername().equals(replierUsername))
+                .map(reply -> {
+                    ReplyWithIdtDto replyWithIdtDto = ReplyMapper.mapFromReplyToReplyWithIdDto(reply, new ReplyWithIdtDto());
+                    replyWithIdtDto.setReplyId(reply.getReplyId());
+                    replyWithIdtDto.setReplierEmail(reply.getUser().getEmail());
+                    return replyWithIdtDto;
+                })
+                .collect(Collectors.toList());
 
-        retrievedPost.getReplies().forEach(
-                reply -> {
-                    if(reply.getUser().getUsername().equals(replierUsername)){
-                        ReplyWithIdtDto replyWithIdtDto=ReplyMapper.mapFromReplyToReplyWithIdDto(reply,new ReplyWithIdtDto());
-                        replyWithIdtDto.setReplierEmail(reply.getUser().getEmail());
-                        relatedRepliesofUserOnSinglePost.add(replyWithIdtDto);
-                    }
-                }
-        );
-
-
-        //mapping to post dto with id then  setting the post creator
-
-        PostsDtoWithId postsDtoWithId=PostsMapper.mapToPostsDToWithId(retrievedPost,new PostsDtoWithId());
-        //setting the image
+        // mapping to post dto with id then setting the post creator
+        PostsDtoWithId postsDtoWithId = PostsMapper.mapToPostsDToWithId(retrievedPost, new PostsDtoWithId());
         postsDtoWithId.setImage(Utils.encodeImageToBase64(retrievedPost.getImage()));
 
-        //setting the idGroup to userDto
-        UserDto myUserDto=new UserDto();
+        // setting the idGroup to userDto
+        UserDto myUserDto = new UserDto();
         myUserDto.setIdUserGroup(retrievedPost.getIdGroup());
-        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(retrievedPost.getUser(),myUserDto));
+        postsDtoWithId.setUserDto(UserMapper.mapToUserDTo(retrievedPost.getUser(), myUserDto));
 
-
-
-        //forming my PostWithReplies dto , so I can expose it to the client
-        PostWithRepliesDto postWithRepliesDto=new PostWithRepliesDto(postsDtoWithId,relatedRepliesofUserOnSinglePost);
-
+        // forming my PostWithReplies dto, so I can expose it to the client
+        PostWithRepliesDto postWithRepliesDto = new PostWithRepliesDto(
+                retrievedPost.getCreatedAt(),
+                retrievedPost.getUpdatedAt(),
+                postsDtoWithId,
+                relatedRepliesOfUserOnSinglePost
+        );
 
         return postWithRepliesDto;
     }
+
 
     /**
      * @param replyWithIdtDto - ReplyWithIdtDto object
@@ -255,7 +256,7 @@ public class ReplyServiceImpl implements IReplyService {
                     })
                     .collect(Collectors.toList());
 
-            return new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+            return new PostWithRepliesDto(posts.getCreatedAt(),posts.getUpdatedAt(),postsDtoWithId, repliesWithIdDto);
         }).collect(Collectors.toList());
     }
 
@@ -299,7 +300,7 @@ public class ReplyServiceImpl implements IReplyService {
                     })
                     .collect(Collectors.toList());
 
-            return new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+            return new PostWithRepliesDto(posts.getCreatedAt(),posts.getUpdatedAt(),postsDtoWithId, repliesWithIdDto);
         }).collect(Collectors.toList());
     }
 
@@ -344,7 +345,9 @@ public class ReplyServiceImpl implements IReplyService {
                     })
                     .collect(Collectors.toList());
 
-            return new PostWithRepliesDto(postsDtoWithId, repliesWithIdDto);
+
+
+            return new PostWithRepliesDto(posts.getCreatedAt(),posts.getUpdatedAt(),postsDtoWithId, repliesWithIdDto);
         }).collect(Collectors.toList());
     }
 
@@ -382,11 +385,13 @@ public class ReplyServiceImpl implements IReplyService {
         }
 
         // Adding general group also
-        Collection<PostWithRepliesDto> generalGroupPosts = filterPostsByGroupId("");
+        Collection<PostWithRepliesDto> generalGroupPosts = filterPostsByGroupId("general");
         groupsPostsWithReplies.add(generalGroupPosts);
 
         return groupsPostsWithReplies;
     }
+
+
 
 
 
