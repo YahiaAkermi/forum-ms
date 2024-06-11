@@ -17,4 +17,6 @@ public interface ReplyRepository extends JpaRepository<Reply,String> {
     Collection<Reply> findRepliesByPostAndUser(Posts post, User user);
 
     Optional<Reply> findReplyByReplyId(String replyId);
+
+    void deleteByPostPostId(String postId);
 }

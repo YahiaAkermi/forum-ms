@@ -10,6 +10,7 @@ import com.yahia.forum.exception.ResourceNotFoundException;
 import com.yahia.forum.mapper.PostsMapper;
 import com.yahia.forum.mapper.UserMapper;
 import com.yahia.forum.repository.PostsRepository;
+import com.yahia.forum.repository.ReplyRepository;
 import com.yahia.forum.repository.UserRepository;
 import com.yahia.forum.service.IPostsService;
 import com.yahia.forum.utils.Utils;
@@ -28,6 +29,8 @@ public class PostsServiceImpl implements IPostsService {
 
     private UserRepository userRepository;
     private PostsRepository postsRepository;
+
+    private ReplyRepository replyRepository;
 
 
     /**
@@ -263,12 +266,16 @@ public class PostsServiceImpl implements IPostsService {
      */
     @Override
     public boolean deletePost(String postId) {
-
-        Posts posts=postsRepository.findById(postId).orElseThrow(
-                () -> new ResourceNotFoundException("Posts","postId",postId)
+        // Find the post by ID
+        Posts post = postsRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Posts", "postId", postId)
         );
 
-        postsRepository.deleteById(posts.getPostId());
+        // Delete all replies associated with the post
+        replyRepository.deleteByPostPostId(post.getPostId());
+
+        // Delete the post
+        postsRepository.deleteById(post.getPostId());
 
         return true;
     }

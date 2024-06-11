@@ -27,6 +27,7 @@ public class PostsController {
 
     private IPostsService iPostsService;
 
+
     @PostMapping("/create")
     public ResponseEntity<ResponseDto> createPost(
             @Valid
