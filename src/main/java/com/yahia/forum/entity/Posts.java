@@ -1,13 +1,15 @@
 package com.yahia.forum.entity;
 
-import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.Collection;
 
-@Entity @Data @AllArgsConstructor @NoArgsConstructor
+@Entity
+@Data @AllArgsConstructor @NoArgsConstructor
 public class Posts extends BaseEntity{
 
     @Id

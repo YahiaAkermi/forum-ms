@@ -6,10 +6,9 @@ import com.yahia.forum.dto.PostsDto;
 import com.yahia.forum.dto.PostsDtoWithId;
 import com.yahia.forum.dto.ResponseDto;
 
-import com.yahia.forum.entity.enums.UserType;
+
 import com.yahia.forum.service.IPostsService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
+
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.util.Collection;
 
 @RestController
